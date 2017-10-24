@@ -26,6 +26,25 @@ restaSeg Cero x = error "No definido"
 restaSeg (Suce x) (Suce y) = restaSeg x y
 
 
+data Arbol = Hoja Int | Nodo Arbol Int Arbol deriving Show
+
+aparece :: Int -> Arbol -> Bool
+aparece x (Hoja y) =  if x==y then True else False
+aparece x (Nodo izq y der) = if aparece x izq || aparece x der then True else False
+
+aplanaPO :: Arbol -> [Int]
+aplanaPO (Hoja x) = [x]
+aplanaPO (Nodo izq x der) = x:(aplanaPO izq ++ aplanaPO der)
+
+aplanaIO :: Arbol -> [Int]
+aplanaIO (Hoja x) = [x]
+aplanaIO (Nodo izq x der) = (aplanaIO izq) ++   x:(aplanaIO der)
+
+aplanaPsO :: Arbol -> [Int]
+aplanaPsO (Hoja x) = [x]
+aplanaPsO (Nodo izq x der) = (aplanaPsO izq ++ aplanaPsO der) ++  [x]
+
+
 data Lista = Vacia | Conc Int Lista deriving Show
 
 long :: Lista -> Int
@@ -56,6 +75,34 @@ reversa Vacia = Vacia
 reversa (Conc int Vacia) = Conc int Vacia
 reversa x = concatena (dropL ((long x)-1) x) (reversa (takeL ((long x)-1) x))
 
-data Arbol = Hoja Int | Nodo Arbol Int Arbol deriving Show
 
-aparece :: Int -> Arbol -> Bool
+type ProductoBI = [(Int,Int)]
+type RelacionBI = ProductoBI
+
+union :: RelacionBI -> RelacionBI-> RelacionBI
+union x [] = x
+union x (y:ys) = if y `elem` x then union x ys else union x ys ++ [y]
+
+interseccion :: RelacionBI -> RelacionBI-> RelacionBI
+interseccion x [] = []
+interseccion x (y:ys) = if y `elem` x then interseccion x ys ++ [y] else interseccion x ys
+
+diferencia :: RelacionBI -> RelacionBI-> RelacionBI
+diferencia x [] = x
+diferencia [] y = []
+diferencia (x:xs) y = if x `elem` y then diferencia xs y  else [x] ++ diferencia xs y
+
+inversa :: RelacionBI -> RelacionBI
+inversa [(x,y)] = [(y,x)]
+inversa ((x,y):xs) = [(y,x)] ++ inversa xs
+
+composicion :: RelacionBI -> RelacionBI -> RelacionBI
+composicion x [] = []
+composicion [] (y:ys) = []
+composicion [(x1,y1)] [(x2,y2)] = if y1==x2 then [(x1,y2)] else []  
+composicion ((x1,y1):xs) ((x2,y2):ys) = (if y1/=x2 then composicion ((x1,y1):xs) ys else [(x1,y2)] ++ composicion ((x1,y1):xs) ys) ++ composicion xs ((x2,y2):ys)
+
+reflexividad :: RelacionBI -> Bool
+reflexividad [] = False
+reflexividad [(x,y)] = if x==y then True else False
+reflexividad ((x,y):xs) =  if ((x,x)`elem`((x,y):xs)) && ((y,y)`elem`((x,y):xs)) then reflexividad (xs) else False
