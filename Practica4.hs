@@ -1,4 +1,4 @@
-import Data.Char
+simport Data.Char
 
 primeros :: [(a,b)] -> [a]
 primeros ls = [fst par | par <- ls]
